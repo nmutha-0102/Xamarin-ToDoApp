@@ -34,7 +34,7 @@ namespace ToDoApp
     {
         public App() : this(null) { }
 
-        public App(IPlatformInitializer initializer) : base(initializer) 
+        public App(IPlatformInitializer initializer) : base(initializer)
         { }
 
         public new static App Current => Application.Current as App;
@@ -45,10 +45,17 @@ namespace ToDoApp
             SetAppTheme();
 
             var auth = DependencyService.Get<IFirebaseAuthentication>();
-            var isLoggedIn = auth.IsLoggedIn();
-            if (isLoggedIn)
+            if (Xamarin.Forms.Device.RuntimePlatform != Device.WPF)
             {
-                await NavigationService.NavigateAsync($"/{nameof(NavigationPage)}/{nameof(TasksPage)}");
+                var isLoggedIn = auth.IsLoggedIn();
+                if (isLoggedIn)
+                {
+                    await NavigationService.NavigateAsync($"/{nameof(NavigationPage)}/{nameof(TasksPage)}");
+                }
+                else
+                {
+                    await NavigationService.NavigateAsync($"/{nameof(NavigationPage)}/{nameof(WelcomePage)}");
+                }
             }
             else
             {
@@ -96,7 +103,11 @@ namespace ToDoApp
 
         private void SetAppTheme()
         {
-            var theme = Preferences.Get("theme", string.Empty);
+            string theme = string.Empty;
+            if (Xamarin.Forms.Device.RuntimePlatform != Device.WPF)
+            {
+                theme = Preferences.Get("theme", string.Empty);
+            }
             if (string.IsNullOrEmpty(theme) || theme == "light")
             {
                 Application.Current.UserAppTheme = OSAppTheme.Light;

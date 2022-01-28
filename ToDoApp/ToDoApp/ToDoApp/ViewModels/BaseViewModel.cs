@@ -33,8 +33,11 @@ namespace ToDoApp.ViewModels
         public BaseViewModel(INavigationService navigationService)
         {
             _navigationService = navigationService;
-            Connectivity.ConnectivityChanged += ConnectivityChanged;
-            HasNoInternetConnection = !Connectivity.NetworkAccess.Equals(NetworkAccess.Internet);
+            if (Xamarin.Forms.Device.RuntimePlatform != Xamarin.Forms.Device.WPF)
+            {
+                Connectivity.ConnectivityChanged += ConnectivityChanged;
+                HasNoInternetConnection = !Connectivity.NetworkAccess.Equals(NetworkAccess.Internet);
+            }
         }
 
         #endregion
